@@ -5,11 +5,11 @@ import br.com.jnmpdev.esppayapi.model.PayDevice;
 import br.com.jnmpdev.esppayapi.model.PaymentGateway;
 import br.com.jnmpdev.esppayapi.service.PayDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/device")
@@ -65,5 +65,25 @@ public class PayDeviceController {
         PayDevice device = payDeviceService.activateDevice(id);
         return ResponseEntity.ok(device);
     }
+
+    @GetMapping("/{serial}/ping")
+    public ResponseEntity<?> pingDevice(@PathVariable String serial) {
+        Optional<PayDevice> device = payDeviceService.findBySerial(serial);
+        if (device.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Dispositivo não encontrado");
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("deviceId", device.get().getId());
+        response.put("active", device.get().isActive());
+        response.put("logEnabled", device.get().isLogEnabled());
+        response.put("gateway", device.get().getGateway());
+        response.put("location", device.get().getLocation());
+
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }

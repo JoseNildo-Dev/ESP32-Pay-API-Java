@@ -32,7 +32,7 @@ public class PayDeviceService {
     }
 
     public PayDevice selfRegister(DeviceSelfRegisterRequest request) {
-        Optional<PayDevice> existing = payDeviceRepository.findBySerial(request.getSerial());
+        Optional<PayDevice> existing = Optional.ofNullable(payDeviceRepository.findBySerial(request.getSerial()));
 
         if (existing.isPresent()) {
             return existing.get(); // Comentário: já existe, retorna sem duplicar
@@ -51,7 +51,7 @@ public class PayDeviceService {
     }
 
     public Optional<PayDevice> findBySerial(String serial) {
-        return payDeviceRepository.findBySerial(serial);
+        return Optional.ofNullable(payDeviceRepository.findBySerial(serial));
     }
 
     public PayDevice activateDevice(Long id) {
@@ -61,6 +61,5 @@ public class PayDeviceService {
         device.setActive(true);
         return payDeviceRepository.save(device);
     }
-
 
 }

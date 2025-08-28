@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -59,7 +60,7 @@ public class PixService {
 
 
     // Comentário: consulta o status de uma transação
-    public PixResponse getStatus(Long transactionId) {
+    /*public PixResponse getStatus(Long transactionId) {
         PixTransaction transaction = pixTransactionRepository.findById(transactionId)
                 .orElseThrow(() -> new RuntimeException("Transação não encontrada"));
 
@@ -68,7 +69,55 @@ public class PixService {
         response.setStatus(transaction.getStatus());
 
         return response;
+    }*/
+
+    public List<PixTransaction> getTransactionsByDevice(Long deviceId) {
+        return pixTransactionRepository.findByDeviceId(deviceId);
     }
+
+    public PixResponse simulateStatus(Long transactionId, String newStatus) {
+        PixTransaction transaction = pixTransactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transação não encontrada"));
+
+        transaction.setStatus(newStatus);
+        pixTransactionRepository.save(transaction);
+
+        PixResponse response = new PixResponse();
+        response.setQrCode(transaction.getQrCode());
+        response.setStatus(transaction.getStatus());
+
+        return response;
+    }
+
+    public PixResponse cancelTransaction(Long transactionId, String reason) {
+        PixTransaction transaction = pixTransactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transação não encontrada"));
+
+        transaction.setStatus("CANCELLED");
+        transaction.setDescription(transaction.getDescription() + " [Cancelado: " + reason + "]");
+        pixTransactionRepository.save(transaction);
+
+        PixResponse response = new PixResponse();
+        response.setQrCode(transaction.getQrCode());
+        response.setStatus(transaction.getStatus());
+
+        return response;
+    }
+
+    public PixResponse getStatus(Long transactionId) {
+        PixTransaction transaction = pixTransactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transação não encontrada"));
+
+        PixResponse response = new PixResponse();
+        response.setTransactionId(transaction.getId());
+        response.setQrCode(transaction.getQrCode());
+        response.setStatus(transaction.getStatus());
+
+
+        return response;
+    }
+
+
 
 }
 

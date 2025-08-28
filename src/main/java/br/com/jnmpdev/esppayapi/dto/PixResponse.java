@@ -6,6 +6,8 @@ import lombok.Data;
 public class PixResponse {
     private String qrCode;
     private String status;
+    private Long transactionId;
+
 
     // Comentário: representa a resposta da API com o QR gerado e o status da transação
 }
