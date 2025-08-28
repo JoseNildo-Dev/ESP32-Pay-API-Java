@@ -57,6 +57,11 @@ public class PixService {
         PixTransaction transaction = pixTransactionRepository.findById(transactionId)
                 .orElseThrow(() -> new RuntimeException("Transação não encontrada"));
 
+        if (transaction.getStatus().equals("PENDING") && transaction.getExpiresAt().isBefore(LocalDateTime.now())) {
+            transaction.setStatus("EXPIRED");
+            pixTransactionRepository.save(transaction);
+        }
+
         PixResponse response = new PixResponse();
         response.setTransactionId(transaction.getId());
         response.setQrCode(transaction.getQrCode());
@@ -65,9 +70,20 @@ public class PixService {
         return response;
     }
 
+
     public PixResponse simulateStatus(Long transactionId, String newStatus) {
         PixTransaction transaction = pixTransactionRepository.findById(transactionId)
                 .orElseThrow(() -> new RuntimeException("Transação não encontrada"));
+
+        if (transaction.getStatus().equals("EXPIRED")) {
+            throw new IllegalStateException("Transação já expirada. Não é possível alterar o status.");
+        }
+
+        if (transaction.getStatus().equals("PENDING") && transaction.getExpiresAt().isBefore(LocalDateTime.now())) {
+            transaction.setStatus("EXPIRED");
+            pixTransactionRepository.save(transaction);
+            throw new IllegalStateException("Transação expirada. Não é possível simular pagamento.");
+        }
 
         transaction.setStatus(newStatus);
         pixTransactionRepository.save(transaction);
@@ -77,19 +93,24 @@ public class PixService {
         response.setStatus(transaction.getStatus());
         response.setTransactionId(transaction.getId());
 
-
         return response;
     }
 
-    public PixResponse cancelTransaction(Long transactionId, String reason) {
 
+
+    public PixResponse cancelTransaction(Long transactionId, String reason) {
         PixTransaction transaction = pixTransactionRepository.findById(transactionId)
                 .orElseThrow(() -> new RuntimeException("Transação não encontrada"));
+
+        if (transaction.getExpiresAt().isBefore(LocalDateTime.now()) && transaction.getStatus().equals("PENDING")) {
+            transaction.setStatus("EXPIRED");
+            pixTransactionRepository.save(transaction);
+            throw new IllegalStateException("Transação expirada. Não é possível cancelar.");
+        }
 
         if (!transaction.getStatus().equals("PENDING")) {
             throw new IllegalStateException("Não é possível cancelar uma transação que já foi paga ou cancelada.");
         }
-
 
         transaction.setStatus("CANCELLED");
         transaction.setDescription(transaction.getDescription() + " [Cancelado: " + reason + "]");
@@ -100,9 +121,9 @@ public class PixService {
         response.setStatus(transaction.getStatus());
         response.setTransactionId(transaction.getId());
 
-
         return response;
     }
+
 
     public List<PixTransaction> getTransactionsByDevice(Long deviceId) {
         return pixTransactionRepository.findByDeviceId(deviceId);
@@ -135,4 +156,5 @@ public class PixService {
 
         return summary;
     }
+
 }

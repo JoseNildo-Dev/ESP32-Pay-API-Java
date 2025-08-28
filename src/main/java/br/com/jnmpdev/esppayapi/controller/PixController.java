@@ -61,9 +61,9 @@ public class PixController {
 
     @GetMapping("/{id}/status")
     public ResponseEntity<PixResponse> getStatus(@PathVariable Long id) {
-        PixResponse response = pixService.getStatus(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(pixService.getStatus(id));
     }
+
 
     @GetMapping("/device/{id}/summary")
     public ResponseEntity<?> getDeviceSummary(@PathVariable Long id) {
