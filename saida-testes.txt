@@ -1,0 +1,15 @@
+🔁 Teste 1: /device/TEST001/ping
+{"logEnabled":true,"active":true,"location":"Loja A","deviceId":1,"gateway":"MP"}
+💸 Teste 2: Gerar Pix
+{"qrCode":"MP-QR-1756369416895","status":"PENDING","transactionId":6}
+
+🔍 Teste 3: Consultar status da transação 6
+{"qrCode":"MP-QR-1756369416895","status":"PENDING","transactionId":6}
+✅ Teste 4: Simular pagamento
+{"qrCode":"MP-QR-1756369416895","status":"PAID","transactionId":6}
+🔍 Teste 5: Consultar status após pagamento
+{"qrCode":"MP-QR-1756369416895","status":"PAID","transactionId":6}
+❌ Teste 6: Cancelar transação
+{"error":"Bad Request","message":"Não é possível cancelar uma transação que já foi paga ou cancelada.","timestamp":"2025-08-28T05:23:41.059779711-03:00","status":400}
+📊 Teste 7: Resumo do dispositivo
+{"totalPaid":75.00,"totalCancelled":50.00,"totalPending":25.00,"lastTransaction":"2025-08-28T05:23:36.896274"}

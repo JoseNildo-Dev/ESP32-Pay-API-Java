@@ -8,9 +8,12 @@ import br.com.jnmpdev.esppayapi.model.PixTransaction;
 import br.com.jnmpdev.esppayapi.service.PixService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/pix")
@@ -62,6 +65,11 @@ public class PixController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/device/{id}/summary")
+    public ResponseEntity<?> getDeviceSummary(@PathVariable Long id) {
+        Map<String, Object> summary = pixService.getDeviceSummary(id);
+        return ResponseEntity.ok(summary);
+    }
 
 
 }

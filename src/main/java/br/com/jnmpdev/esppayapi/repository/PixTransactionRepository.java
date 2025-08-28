@@ -8,6 +8,8 @@ import java.util.List;
 public interface PixTransactionRepository extends JpaRepository<PixTransaction, Long> {
     List<PixTransaction> findByDeviceId(Long deviceId);
     // Comentário: permite salvar e consultar transações Pix
+    List<PixTransaction> findByStatus(String status);
+
 
     List<PixTransaction> findByDeviceIdOrderByCreatedAtDesc(Long deviceId);
 

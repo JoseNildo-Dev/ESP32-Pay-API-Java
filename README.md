@@ -15,11 +15,17 @@ API REST em Java para gerenciamento de dispositivos de pagamento via Pix, com su
 
 ### 💸 Pix (`PixTransaction`)
 - [x] Geração de QR Pix (`POST /pix/generate`)
-- [x] Delegação dinâmica por gateway
+- [x] Delegação dinâmica por gateway via `PaymentGatewayService`
+- [x] Interface `PixGateway` com contrato padronizado
 - [x] Serviços mockados para MP, Stone e PagSeguro
 - [x] Registro de transações com log opcional
 - [x] Consulta de status (`GET /pix/{id}/status`)
 - [x] Listagem de transações por dispositivo (`GET /device/{id}/transactions`)
+- [x] Simulação de pagamento (`POST /pix/{id}/simulate-status`)
+- [x] Cancelamento com validação (`POST /pix/{id}/cancel`)
+- [x] Resumo por dispositivo (`GET /pix/device/{id}/summary`)
+- [x] Validação de estado: não permite cancelar transações pagas
+- [x] Tratamento global de exceções com resposta 400
 
 ---
 
@@ -28,10 +34,6 @@ API REST em Java para gerenciamento de dispositivos de pagamento via Pix, com su
 ### 🔐 Segurança
 - [ ] Autenticação leve por `authToken` no dispositivo
 - [ ] Validação de token no endpoint de geração de Pix
-
-### 🧪 Simulação
-- [ ] Endpoint para simular mudança de status (`POST /pix/{id}/simulate-status`)
-- [ ] Enum de status: `PENDING`, `PAID`, `FAILED`, `EXPIRED`
 
 ### 🧠 Painel Admin (React)
 - [ ] Listagem de dispositivos com filtro por status
@@ -43,6 +45,21 @@ API REST em Java para gerenciamento de dispositivos de pagamento via Pix, com su
 - [ ] Consulta de status via serial
 - [ ] Geração de Pix com autenticação
 - [ ] Recebimento de confirmação de pagamento
+
+---
+
+## 🧪 Testes automatizados
+
+Script `testes-pix.sh` realiza:
+
+- Ping do dispositivo
+- Geração de Pix
+- Consulta de status
+- Simulação de pagamento
+- Cancelamento com validação
+- Resumo por dispositivo
+
+Saída salva em `saida-testes.txt` com delay entre chamadas.
 
 ---
 
@@ -65,7 +82,9 @@ br.com.jnmpdev.esppayapi
 ├── service
 ├── gateway
 │   ├── PaymentGatewayService.java
+│   ├── PixGateway.java
 │   └── impl/
 ├── model
 ├── dto
 ├── repository
+├── exception
